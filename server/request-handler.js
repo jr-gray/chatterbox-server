@@ -12,6 +12,8 @@ this file and include it in basic-server.js so that it actually works.
 
 **************************************************************/
 
+var messages = {results: []};
+
 var requestHandler = function(request, response) {
   // Request and Response come from node's http module.
   //
@@ -28,13 +30,12 @@ var requestHandler = function(request, response) {
   // debugging help, but you should always be careful about leaving stray
   // console.logs in your code.
   console.log('Serving request type ' + request.method + ' for url ' + request.url);
-  console.log(`Request is ${request}`);
 
   // The outgoing status.
   var statusCode = 200;
   var errorCode = 404;
   var postCode = 201;
-  var stored = [];
+
 
   // See the note below about CORS headers.
   var headers = defaultCorsHeaders;
@@ -43,17 +44,23 @@ var requestHandler = function(request, response) {
   //
   // You will need to change this if you are sending something
   // other than plain text, like JSON or HTML.
+  // headers['Content-Type'] = 'text/plain';
   headers['Content-Type'] = 'text/plain';
 
-  if (request.url === '/classes/messages' && request.method === 'GET') {
-    response.writeHead(statusCode, headers);
-    response.end(JSON.stringify({'results': stored}));
-  } else if (request.url === '/classes/messages' && request.method === 'POST') {
-    response.writeHead(postCode, headers);
-    response.end(JSON.stringify({'results': stored}));
-  } else {
+  if (!request.url.includes('/classes/messages')) {
     response.writeHead(errorCode, headers);
-    response.end(JSON.stringify({'results': stored}));
+    headers['Content-Type'] = 'text/plain';
+    response.end('bad request url duh!');
+  } else if (request.method === 'GET') {
+    response.writeHead(statusCode, headers);
+    response.end(JSON.stringify(messages));
+  } else if (request.method === 'POST') {
+    request.on('data', function(data) {
+      messages.results.push(JSON.parse(data));
+    });
+    headers['Content-Type'] = 'text/plain';
+    response.writeHead(postCode, headers);
+    response.end('message posted!');
   }
 
   // .writeHead() writes to the request line and headers of the response,
@@ -90,3 +97,9 @@ var defaultCorsHeaders = {
 
 exports.requestHandler = requestHandler;
 
+
+// { "url" : "/classes/messages",
+//   "method" : "POST",
+//   "_postData" : {"username" : "Jono", 
+//                  "message" : "Do my bidding!"}
+//  }
