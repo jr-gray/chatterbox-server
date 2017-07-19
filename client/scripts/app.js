@@ -27,7 +27,7 @@ var app = {
 
     // Fetch previous messages
     // app.startSpinner();
-    app.fetch(false);
+    // app.fetch(false);
 
     // Poll for new messages
     // setInterval(function() {
@@ -44,10 +44,12 @@ var app = {
       type: 'POST',
       data: message,
       success: function (data) {
-        // Clear messages input
-        app.$message.val('');
+        console.log('fucckkkkkk yeaaaahhhh message sent')
 
-        // Trigger a fetch to update the messages, pass true to animate
+        // // Clear messages input
+        // app.$message.val('');
+
+        // // Trigger a fetch to update the messages, pass true to animate
         // app.fetch();
       },
       error: function (error) {
@@ -60,7 +62,7 @@ var app = {
     $.ajax({
       url: app.server,
       type: 'GET',
-      data: { order: '-createdAt' },
+      // data: { order: '-createdAt' },
       contentType: 'application/json',
       success: function(data) {
         // Don't bother if we have nothing to work with
@@ -203,7 +205,7 @@ var app = {
         app.$roomSelect.val(roomname);
       }
     } else {
-      app.startSpinner();
+      // app.startSpinner();
       // Store as undefined for empty names
       app.roomname = app.$roomSelect.val();
     }
